@@ -1,36 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Prompt Library
 
-## Getting Started
+A modern web application for managing, versioning, and collaborating on AI prompts. Built with Next.js 16, Supabase, and Tailwind CSS.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Workspace Management**: Organize your prompts into distinct workspaces for better collaboration and separation of concerns.
+- **Prompt Versioning**: Track changes and maintain history for your prompt iterations.
+- **Content Comparison**: Visualize differences between prompt versions using a built-in diff viewer.
+- **Organization Tools**: 
+  - **Tags**: Categorize prompts for easy filtering.
+  - **Favorites**: Quickly access your most-used prompts.
+  - **Ratings**: Meaningful quality assessment for prompts.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+> **Note regarding Email**: While `nodemailer` is included in the project dependencies, it is **not currently configured** or active in the application logic.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Technology Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+This project leverages the latest standards in the React ecosystem:
 
-## Learn More
+![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white) 
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)
 
-To learn more about Next.js, take a look at the following resources:
+- **Framework**: [Next.js 16.1.6](https://nextjs.org/) (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS v4
+- **Backend & Auth**: Supabase (@supabase/ssr)
+- **UI Components**: React 19, Lucide React
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## How to Run with Docker
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+You can containerize and run this application using Docker.
 
-## Deploy on Vercel
+### Prerequisites
+- Docker installed on your machine.
+- A valid `.env.local` file containing your Supabase credentials.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Steps
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. **Build the Docker Image**
+   Run the following command in the root directory of the project:
+   ```bash
+   docker build -t prompt-library .
+
+2. **Run the Container**
+   Start the application on port 3000. You must pass your environment variables (usually found in `.env.local`) to the container for the database connection to work.
+   
+   ```bash
+   docker run -p 3000:3000 --env-file .env.local prompt-library
+
+3. **Access the App**
+   Open your browser and navigate to: [http://localhost:3000](http://localhost:3000)
