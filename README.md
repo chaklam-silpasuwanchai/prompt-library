@@ -1,6 +1,6 @@
 # Prompt Library
 
-A modern web application for managing, versioning, and collaborating on AI prompts. Built with Next.js 16, Supabase, and Tailwind CSS.
+A simple place to keep your favorite prompts. Built with Next.js 16, Supabase, and Tailwind CSS.
 
 ## Features
 
