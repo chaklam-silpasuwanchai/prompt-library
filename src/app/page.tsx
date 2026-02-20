@@ -3,10 +3,9 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import * as Diff from 'diff'
 
-const DEFAULT_USER_ID = 'c04f87b1-2c69-4e97-a971-50d6524ca8a2'
+const USER_ID = 'c04f87b1-2c69-4e97-a971-50d6524ca8a2'
 
-// --- CODE SYNTAX RENDERER ---
-// Highlights common prompt keywords, variables, and patterns
+// Renders prompt content line by line in code style
 const renderSyntaxHighlighted = (text: string) => {
   const lines = text.split('\n')
   return (
@@ -27,33 +26,18 @@ const renderSyntaxHighlighted = (text: string) => {
   )
 }
 
-// Plain text line renderer — no syntax coloring
+// Plain text line renderer
 const SyntaxLine = ({ text }: { text: string }) => {
   if (!text) return <span>&nbsp;</span>
   return <span className="text-slate-700">{text}</span>
 }
 
-// Styled wrapper for the code block
-const CodeBlock = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
-  <div className={`rounded-lg overflow-hidden border border-slate-200 shadow-sm ${className}`}>
-    <div className="bg-white p-4 font-mono text-sm leading-relaxed overflow-x-auto">
-      {children}
-    </div>
-  </div>
-)
-
 export default function PromptLibrary() {
-  // --- AUTH STATE ---
-  const [userId, setUserId] = useState(DEFAULT_USER_ID)
-  const [username, setUsername] = useState('Local User')
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
-
   // --- DATA STATE ---
   const [categories, setCategories] = useState<any[]>([])
   const [newCategoryName, setNewCategoryName] = useState('') 
   const [promptsList, setPromptsList] = useState<any[]>([])
-  const [tagsStats, setTagsStats] = useState<Record<string, number>>({}) 
-  const [debugMsg, setDebugMsg] = useState('')
+  const [tagsStats, setTagsStats] = useState<Record<string, number>>({})
 
   // --- FILTER & PAGINATION STATE ---
   const [searchQuery, setSearchQuery] = useState('')
@@ -89,7 +73,7 @@ export default function PromptLibrary() {
 
     fetchCategories()
     fetchPrompts()
-  }, [userId])
+  }, [])
 
   useEffect(() => {
     setCurrentPage(1)
@@ -115,11 +99,11 @@ export default function PromptLibrary() {
       `)
       .order('created_at', { ascending: false })
 
-    if (error) setDebugMsg(`Fetch Error: ${error.message}`)
+    if (error) console.error(`Fetch Error: ${error.message}`)
     else {
       const processed = data?.map(p => ({
         ...p,
-        is_favorite: p.favorites?.some((f:any) => f.user_id === userId),
+        is_favorite: p.favorites?.some((f:any) => f.user_id === USER_ID),
         prompt_versions: p.prompt_versions.sort((a: any, b: any) => b.version_number - a.version_number)
       })) || []
       setPromptsList(processed)
@@ -165,7 +149,7 @@ export default function PromptLibrary() {
       const { data: pData, error: pError } = await supabase
         .from('prompts')
         .insert([{ 
-          title: title, user_id: userId, category_id: selectedCategory, tags: tagsArray
+          title: title, user_id: USER_ID, category_id: selectedCategory, tags: tagsArray
         }]).select()
 
       if (pError) throw pError
@@ -232,9 +216,9 @@ export default function PromptLibrary() {
   const toggleFavorite = async (promptId: string, currentStatus: boolean) => {
     try {
       if (currentStatus) {
-        await supabase.from('favorites').delete().match({ prompt_id: promptId, user_id: userId })
+        await supabase.from('favorites').delete().match({ prompt_id: promptId, user_id: USER_ID })
       } else {
-        await supabase.from('favorites').insert([{ prompt_id: promptId, user_id: userId }])
+        await supabase.from('favorites').insert([{ prompt_id: promptId, user_id: USER_ID }])
       }
       fetchPrompts()
     } catch (error: any) {
@@ -404,9 +388,11 @@ export default function PromptLibrary() {
            </div>
       <div className="p-6 bg-white">
              <div className="relative group">
-               <CodeBlock>
-                 {renderSyntaxHighlighted(currentVer.content)}
-               </CodeBlock>
+               <div className="rounded-lg overflow-hidden border border-slate-200">
+                 <div className="bg-white p-4 text-sm leading-relaxed overflow-x-auto">
+                   {renderSyntaxHighlighted(currentVer.content)}
+                 </div>
+               </div>
                <button 
                  onClick={() => { navigator.clipboard.writeText(currentVer.content); alert("Copied to clipboard!") }}
                  className="absolute top-10 right-3 bg-slate-700 border border-slate-600 text-slate-300 hover:text-white hover:border-slate-400 text-xs px-3 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 transition-all"
@@ -438,7 +424,7 @@ export default function PromptLibrary() {
             </div>
             <h1 className="text-lg font-bold text-white tracking-tight">Prompt Library</h1>
           </div>
-          <p className="text-xs text-slate-500 pl-11">v3.4 Syntax Highlighting</p>
+          <p className="text-xs text-slate-500 pl-11">Prompt Library</p>
         </div>
 
         {/* SEARCH BAR */}
@@ -505,35 +491,11 @@ export default function PromptLibrary() {
           </div>
         </nav>
 
-        {/* USER PROFILE */}
-        <div className="p-4 border-t border-slate-800 bg-slate-900/50">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold shadow-lg">
-              {username.charAt(0)}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-white truncate">{username}</p>
-              <button onClick={() => setIsLoginModalOpen(true)} className="text-xs text-blue-400 hover:text-blue-300">Switch User</button>
-            </div>
-          </div>
-        </div>
       </aside>
 
       {/* --- MAIN CONTENT --- */}
       <main className="flex-1 ml-64 p-8 transition-all">
         
-        {/* LOGIN MODAL */}
-        {isLoginModalOpen && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm">
-            <div className="bg-white p-6 rounded-xl shadow-2xl w-96">
-              <h2 className="text-lg font-bold mb-4">Login / Switch User</h2>
-              <input className="w-full border p-2 rounded mb-2" placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} />
-              <input className="w-full border p-2 rounded mb-4 text-xs font-mono" placeholder="User UUID" value={userId} onChange={e => setUserId(e.target.value)} />
-              <button onClick={() => setIsLoginModalOpen(false)} className="bg-blue-600 text-white px-4 py-2 rounded w-full">Done</button>
-            </div>
-          </div>
-        )}
-
         {/* CREATE PROMPT WIDGET */}
         {activeFilter === 'ALL' && !searchQuery && (
           <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mb-8 transition-all hover:shadow-md group">

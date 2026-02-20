@@ -4,13 +4,12 @@ A simple place to keep your favorite prompts. Built with Next.js 16, Supabase, a
 
 ## Features
 
-- **Workspace Management**: Organize your prompts into distinct workspaces for better collaboration and separation of concerns.
+- **Workspace Management** (TBD): Organize your prompts into distinct workspaces for better collaboration and separation of concerns.
 - **Prompt Versioning**: Track changes and maintain history for your prompt iterations.
 - **Content Comparison**: Visualize differences between prompt versions using a built-in diff viewer.
 - **Organization Tools**: 
   - **Tags**: Categorize prompts for easy filtering.
   - **Favorites**: Quickly access your most-used prompts.
-  - **Ratings**: Meaningful quality assessment for prompts.
 
 > **Note regarding Email**: While `nodemailer` is included in the project dependencies, it is **not currently configured** or active in the application logic.
 
